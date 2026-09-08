@@ -1,5 +1,17 @@
 import platform as _platform
 import subprocess as _subprocess
+import sys as _sys
+
+# ── Force UTF-8 on stdout/stderr ──────────────────────────────────────────────
+# On non-English Windows the console uses a legacy codepage (cp1255, cp1252, …)
+# that cannot encode the emoji in our log lines. A single print() then raises
+# UnicodeEncodeError inside the audio tasks, collapsing the whole TaskGroup.
+for _stream in (_sys.stdout, _sys.stderr):
+    try:
+        _stream.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
+# ─────────────────────────────────────────────────────────────────────────────
 
 # ── Nuclear: force CREATE_NO_WINDOW on EVERY subprocess call on Windows ───────
 # This patches Popen itself, so no per-file flag is needed anywhere.
